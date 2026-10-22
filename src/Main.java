@@ -9,6 +9,11 @@ public class Main {
         List<Order> orders = createOrders(products);
 
 
+        OrderAnalyticsService service = new OrderAnalyticsService();
+
+        orders.forEach(order ->
+                System.out.println("Order ID: " + order.getOrderId() + ", Total: ₹" + service.orderTotal(order)));
+
         Optional<Order> result = orderLookup(orders,10000);
         if(result.isPresent()){
             System.out.println(result.get());
@@ -31,12 +36,47 @@ public class Main {
         sortedProducts.forEach(System.out::println);
 
         List<Order> completedOrders = orders.stream().filter(order -> order.getStatus()==OrderStatus.COMPLETED).collect(Collectors.toList());
-
+        System.out.println("\ntotal revenue:");
+        System.out.println("₹" + service.totalRevenue(orders));
        // orders.forEach(System.out::println);
       completedOrders.forEach(System.out::println);
 
+
+        System.out.println("\nOrders grouped by customers");
+        service.getOrdersByCustomer(orders).forEach((customer, customerOrders) -> {System.out.println(customer + ":");customerOrders.forEach(order -> System.out.println("  Order ID: " + order.getOrderId()));});
        // System.out.println(orders);
+
+        System.out.println("\ncustomer spendings");
+        service.getCustomerSpending(orders).forEach((customer, amount) -> System.out.println(customer + ": ₹" + amount));
+
+
+        System.out.println("\npopular products");
+        service.getPopularProducts(orders)
+                .forEach((product, quantity) ->
+                        System.out.println(product + ": " + quantity + " sold"));
+
+        System.out.println("\nrevenue by category");
+        service.getCategoryRevenue(orders).forEach((category, revenue) ->
+                        System.out.println(category + ": ₹" + revenue));
+
+        System.out.println("\nOrders Sorted by Total ");
+        service.sortOrdersByTotal(orders).forEach(order ->
+                        System.out.println("Order ID: " + order.getOrderId() + ", Total: ₹" + service.orderTotal(order)
+                        ));
+
+        System.out.println("\nPartitioned Orders ");
+
+        Map<Boolean, List<Order>> partitioned =
+                service.partitionOrders(orders);
+
+        System.out.println("Completed Orders:");
+        partitioned.get(true).forEach(System.out::println);
+
+        System.out.println("Non-Completed Orders:");
+        partitioned.get(false).forEach(System.out::println);
     }
+
+
 
     private static List<Product> createProducts() {
         List<Product> products = new ArrayList<>();
