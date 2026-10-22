@@ -102,6 +102,10 @@ public class Main {
                 new OrderItem(products.get(0), 2),
                 new OrderItem(products.get(1), 1)
         ), OrderStatus.COMPLETED));
+//        orders.add(new Order(101, "Asha", List.of(
+//                new OrderItem(products.get(0), 2),
+//                new OrderItem(products.get(1), 1)
+//        ), OrderStatus.COMPLETED));
 
 
         orders.add(new Order(102, "Rahul", List.of(
@@ -137,6 +141,9 @@ public class Main {
     private static Optional<Order> orderLookup(List<Order> orders,int orderId){
         HashMap<Integer , Order>  orderMap= new HashMap<>();
         for (Order order: orders){
+            if(orderMap.containsKey(order.getOrderId())){
+                throw new IllegalArgumentException("Duplicate Order ID"+order.getOrderId());
+            }
             orderMap.put(order.getOrderId(),order);
         }
         return Optional.ofNullable(orderMap.get(orderId));
